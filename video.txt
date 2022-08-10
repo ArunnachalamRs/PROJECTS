@@ -1,0 +1,66 @@
+                                             VIDEO
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@drawable/thor">
+
+    <Button
+        android:layout_width="110dp"
+        android:layout_height="60dp"
+        android:text="Select"
+        android:textSize="15dp"
+        android:textStyle="bold"
+        android:layout_centerInParent="true"
+        android:onClick="Select"
+        />
+
+</RelativeLayout>
+
+
+
+package com.example.video;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+
+import com.khizar1556.mkvideoplayer.MKPlayerActivity;
+
+import net.alhazmy13.mediapicker.Video.VideoPicker;
+
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+    public void Select(View view) {
+        new VideoPicker.Builder(MainActivity.this)
+                .mode(VideoPicker.Mode.CAMERA_AND_GALLERY)
+                .directory(VideoPicker.Directory.DEFAULT)
+                .extension(VideoPicker.Extension.MP4)
+                .enableDebuggingMode(true)
+                .build();
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == VideoPicker.VIDEO_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> mPaths =  data.getStringArrayListExtra(VideoPicker.EXTRA_VIDEO_PATH);
+            MKPlayerActivity.configPlayer(this).play(mPaths.get(0));
+        }
+    }
+}

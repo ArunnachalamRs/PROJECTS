@@ -1,0 +1,163 @@
+                                                        SPEECH TO TEXT 
+
+
+import 'package:avatar_glow/avatar_glow.dart';
+import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home:SpeechScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class SpeechScreen extends StatefulWidget {
+  @override
+  _SpeechScreenState createState() => _SpeechScreenState();
+}
+
+class _SpeechScreenState extends State<SpeechScreen> {
+  late stt.SpeechToText _speech;
+  bool _isListening =false;
+  String _textSpeech='press the button to speak';
+  @override
+  void initState(){
+    super.initState();
+    _speech =stt.SpeechToText();
+  }
+
+void onlisten() async{
+    if(!_isListening){
+      bool available= await _speech.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => print('onError:$val'),
+      );
+      if(available){
+        setState(() {
+          _isListening=true;
+        });
+        _speech.listen(
+          onResult: (val)=>setState(() {
+            _textSpeech=val.recognizedWords;
+          })
+        );
+      }
+    }else{
+      setState(() {
+        _isListening=false;
+        _speech.stop();
+      });
+    }
+}
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('SPEECH TO TEXT')),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AvatarGlow(
+        animate:_isListening,
+        glowColor: Theme.of(context).primaryColor,
+        endRadius: 80,
+        duration: Duration(milliseconds: 2000),
+        repeatPauseDuration: Duration(milliseconds: 100),
+        repeat: true,
+        child: FloatingActionButton(
+          onPressed: ()=>onlisten(),
+          child: Icon(_isListening ? Icons.mic:Icons.mic_none),
+        )
+      ),
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(25, 25, 25, 150),
+          child: Text(
+            _textSpeech,
+            style: TextStyle(
+              fontSize: 32,
+              color: Colors.black,
+              fontWeight: FontWeight.w500
+            ),
+          ),
+
+
+
+
+
+
+
+
+        ),
+      ),
+
+
+
+
+    );
+  }
+}
+
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.speech">
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+   <application
+        android:label="speech"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+</manifest>
+
+
+ speech_to_text: ^5.4.3
+  avatar_glow: ^2.0.2

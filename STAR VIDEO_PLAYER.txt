@@ -1,0 +1,233 @@
+                                        STAR VIDEO_PLAYER
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@drawable/thor">
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="70dp"
+        android:text="SELECT FILES"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:layout_centerInParent="true"
+        android:drawableRight="@drawable/ic_baseline_folder_24"
+        android:background="@drawable/button_color"
+        android:onClick="View"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        >
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="15dp"
+            android:src="@drawable/google"/>
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="15dp"
+            android:src="@drawable/face"/>
+
+
+
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-6934654003734975/7677082990">
+    </com.google.android.gms.ads.AdView>
+
+
+</RelativeLayout>
+
+
+
+
+package com.example.starvideo_player;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.khizar1556.mkvideoplayer.MKPlayerActivity;
+
+import net.alhazmy13.mediapicker.Video.VideoPicker;
+
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+    private AdView mAdView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.action_bar_layout);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        AdView adView = new AdView(this);
+
+        adView.setAdSize(AdSize.BANNER);
+
+        adView.setAdUnitId("ca-app-pub-6934654003734975/7677082990");
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
+    }
+
+    public void View(View view) {
+        new VideoPicker.Builder(MainActivity.this)
+                .mode(VideoPicker.Mode.CAMERA_AND_GALLERY)
+                .directory(VideoPicker.Directory.DEFAULT)
+                .extension(VideoPicker.Extension.MP4)
+                .enableDebuggingMode(true)
+                .build();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == VideoPicker.VIDEO_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> mPaths =  data.getStringArrayListExtra(VideoPicker.EXTRA_VIDEO_PATH);
+            MKPlayerActivity.configPlayer(this).play(mPaths.get(0));
+        }
+    }
+
+}
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="@color/purple_700"
+        android:endColor="@color/purple_700"/>
+
+    <corners
+        android:radius="80dp"/>
+
+
+</shape>
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.starvideo_player">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/apj"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/apj"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.STARVIDEO_PLAYER">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6934654003734975~3729071459"/>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTile"
+        style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/app_name"
+        android:textColor="#FFFFFF"
+        android:textSize="25dp"
+        android:textStyle="bold" />
+
+
+</LinearLayout>
